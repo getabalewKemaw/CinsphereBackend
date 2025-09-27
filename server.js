@@ -20,7 +20,7 @@ app.use(cookieParser());
 const allowedOrigins = [
   "http://localhost:5173",
   "http://localhost:5174",
-  "https://gech-movie-app.vercel.app"
+  "https://cinisphere.vercel.app"
 ];
 
 app.use(cors({
