@@ -1,24 +1,20 @@
+// middleware/authMiddleware.js
 import jwt from "jsonwebtoken";
+import User from "../models/User.js";
 
-export const authMiddleWare = (req, res, next) => {
-// 1. Get token from Authorization header
-  const token = req.cookies.token;
-if (!token) return res.status(401).json({ msg: "No token, auth denied" });
-
-  // 2. Format should be "Bearer <token>"
-
- 
-
+export const authMiddleWare = async (req, res, next) => {
   try {
-    // 3. Verify token
+    const token = req.cookies.token || req.header("Authorization")?.replace("Bearer ", "");
+    if (!token) return res.status(401).json({ msg: "No token, auth denied" });
+
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const user = await User.findById(decoded.id);
+    if (!user) return res.status(401).json({ msg: "User not found" });
 
-    // 4. Attach user payload to request (decoded = { id: user._id, iat, exp })
-    req.user = decoded;
-
-    next(); // ✅ Go to next middleware/controller
+    req.user = user; // attach full user object
+    next();
   } catch (error) {
     console.error("Token verification failed:", error.message);
-    return res.status(401).json({ msg: "Token is not valid" });
+    return res.status(401).json({ msg: "Authentication failed", error: error.message });
   }
 };

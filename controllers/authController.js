@@ -59,6 +59,11 @@ export const login = async (req, res) => {
     console.log("📩 Request body:", req.body);
 
     const { email, password } = req.body;
+    if (!req.body) {
+  return res.status(400).json({ msg: "Request body is missing" });
+}
+
+
 
     // 1. Check user exists
     const user = await User.findOne({ email });
